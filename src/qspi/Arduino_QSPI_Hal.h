@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_FLASHTRANSPORT_QSPI_H_
-#define ADAFRUIT_FLASHTRANSPORT_QSPI_H_
+#ifndef ARDUINO_QSPI_HAL_H_
+#define ARDUINO_QSPI_HAL_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -80,4 +80,4 @@ public:
   virtual bool writeMemory(uint32_t addr, uint8_t const *data, uint32_t len);
 };
 
-#endif /* ADAFRUIT_FLASHTRANSPORT_QSPI_H_ */
+#endif /* ARDUINO_QSPI_HAL_H_ */

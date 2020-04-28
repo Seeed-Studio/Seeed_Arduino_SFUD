@@ -1,5 +1,5 @@
 /**
- * @file Adafruit_QSPI.cpp
+ * @file Arduino_QSPI_Hal.cpp
  *
  * The MIT License (MIT)
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 #ifdef __SAMD51__
-#include "Adafruit_FlashTransport_QSPI.h"
+#include "Arduino_QSPI_Hal.h"
 #include "wiring_private.h"
 #include <Arduino.h>
 

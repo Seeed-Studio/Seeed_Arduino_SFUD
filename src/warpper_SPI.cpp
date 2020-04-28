@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include "qspi/Adafruit_FlashTransport_QSPI.h"
+#include "qspi/Arduino_QSPI_Hal.h"
 #include "warpper_SPI.h"
 
 
