@@ -34,9 +34,9 @@
 #define SFUD_USING_SFDP
 
 #define SFUD_USING_FLASH_INFO_TABLE
-
+#ifdef __SAMD51__
 #define SFUD_USING_QSPI
-
+#endif
 enum {
     SFUD_W25Q32_DEVICE_INDEX = 0,
 };
