@@ -163,6 +163,26 @@ bool Adafruit_FlashTransport_QSPI::writeMemory(uint32_t addr,
   return true;
 }
 
+bool Adafruit_FlashTransport_QSPI::readSFDP(uint8_t command,
+                                               uint8_t *data,
+                                               uint32_t data_len,
+                                               uint8_t *response,
+                                               uint32_t len) {
+
+  samd_peripherals_disable_and_clear_cache();
+
+  uint32_t iframe = QSPI_INSTRFRAME_WIDTH_SINGLE_BIT_SPI |
+                    QSPI_INSTRFRAME_ADDRLEN_24BITS |
+                    QSPI_INSTRFRAME_TFRTYPE_READ | QSPI_INSTRFRAME_INSTREN |
+                    QSPI_INSTRFRAME_DATAEN | QSPI_INSTRFRAME_ADDREN;
+
+  _run_instruction(command,iframe,data[0]<<16|data[1]<<8|data[2],response,len);
+
+  samd_peripherals_enable_cache();
+
+  return true;
+}
+
 /**************************************************************************/
 /*!
  @brief set the clock speed

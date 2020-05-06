@@ -36,6 +36,10 @@ bool QSPIReadCommand(uint8_t command, uint8_t *response, uint32_t len){
 bool QSPIWriteCommand(uint8_t command, uint8_t const *data, uint32_t len){
     return QSPIDEV.writeCommand(command,data,len);
 }
+bool QSPIReadSFDP(uint8_t command, uint8_t *data, uint32_t data_len, uint8_t *response, uint32_t len){
+    return QSPIDEV.readSFDP(command,data,data_len,response,len);
+}
+
 #else
 #define SPIDEV SPI
 void SPIBegin(){

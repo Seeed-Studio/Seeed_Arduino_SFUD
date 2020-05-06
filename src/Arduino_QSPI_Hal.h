@@ -78,6 +78,7 @@ public:
   virtual bool eraseCommand(uint8_t command, uint32_t address);
   virtual bool readMemory(uint32_t addr, uint8_t *data, uint32_t len);
   virtual bool writeMemory(uint32_t addr, uint8_t const *data, uint32_t len);
+  virtual bool readSFDP(uint8_t command, uint8_t *data, uint32_t data_len, uint8_t *response, uint32_t len);
 };
 
 #endif /* ARDUINO_QSPI_HAL_H_ */

@@ -58,8 +58,16 @@ static sfud_err spi_write_read(const sfud_spi *spi, const uint8_t *write_buf, si
             QSPIEraseCommand(write_buf[0],Address);
         }
         else if (write_size > 4){
-            uint32_t Address = (write_buf[1] << 16) | (write_buf[2] << 8) | (write_buf[3]);
-            QSPIWriteMemory(Address,write_buf+4,write_size - 4);
+            if(read_size){
+                QSPIReadSFDP(write_buf[0],write_buf + 1,write_size - 1,read_buf,read_size + 1);
+                for (uint8_t index = 0 ; index < read_size; index++)
+                {
+                    read_buf[index] = read_buf[index + 1];
+                }
+            }else{
+                uint32_t Address = (write_buf[1] << 16) | (write_buf[2] << 8) | (write_buf[3]);
+                QSPIWriteMemory(Address,write_buf+4,write_size - 4);
+            }
         }
         else{
             QSPIWriteCommand(write_buf[0],write_buf+1,write_size-1);

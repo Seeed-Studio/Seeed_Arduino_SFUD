@@ -16,6 +16,7 @@ bool QSPIEraseCommand(uint8_t command,uint32_t address);
 bool QSPIRunCommand(uint8_t command);
 bool QSPIReadCommand(uint8_t command, uint8_t *response, uint32_t len);
 bool QSPIWriteCommand(uint8_t command, uint8_t const *data, uint32_t len);
+bool QSPIReadSFDP(uint8_t command, uint8_t *data, uint32_t write_data, uint8_t *response, uint32_t len);
 #else
 void SPIBegin();
 uint8_t SPITransfer(uint8_t data);
