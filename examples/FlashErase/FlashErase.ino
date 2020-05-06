@@ -4,8 +4,14 @@
 static uint8_t sfud_demo_test_buf[SFUD_DEMO_TEST_BUFFER_SIZE];
 static void sfud_demo(uint32_t addr, size_t size, uint8_t *data);
 
+#define SERIAL Serial
+#ifdef ARDUINO_ARCH_SAMD
+    #undef SERIAL Serial
+    #define SERIAL SerialUSB
+#endif
 void setup()
 {
+    while(!SERIAL) {};
     while(!(sfud_init() == SFUD_SUCCESS));
 }
 
