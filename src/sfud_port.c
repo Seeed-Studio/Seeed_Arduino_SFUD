@@ -32,9 +32,8 @@
 
 static char log_buf[256];
 
-#ifndef SFUD_USING_QSPI
-const int chipSelectPin = 1;
-#endif
+int chipSelectPin = 1;
+
 void sfud_log_debug(const char *file, const long line, const char *format, ...);
 /**
  * SPI write data then read data

@@ -45,6 +45,6 @@ enum {
 {                                                                              \
     [SFUD_W25Q32_DEVICE_INDEX] = {.name = "W25Q32",.spi.name = "QSPI"},           \
 }
-
+extern int chipSelectPin;
 #define SFUD_W25Q32_MAX_SPEED 104000000UL
 #endif /* _SFUD_CFG_H_ */
