@@ -18,7 +18,7 @@ void setup()
     const sfud_flash *flash = sfud_get_device_table() + 0;
     uint32_t addr = 0;
     size_t size = sizeof(sfud_demo_test_buf);
-    uint8_t result = sfud_write(flash, addr, size, sfud_demo_test_buf);
+    uint8_t result = sfud_erase_write(flash, addr, size, sfud_demo_test_buf);
     if (result == SFUD_SUCCESS) {
     printf("Write the %s flash data finish. Start from 0x%08X, size is %ld.\r\n", flash->name, addr,
             size);
