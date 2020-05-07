@@ -115,7 +115,6 @@ static sfud_err qspi_read(const struct __sfud_spi *spi, uint32_t addr, sfud_qspi
     /**
      * add your qspi read flash data code
      */
-    SFUD_INFO("QSPIReadMemory");
     if (qspi_read_cmd_format->instruction_lines == 1&& qspi_read_cmd_format->address_lines == 1 \
         && qspi_read_cmd_format->data_lines == 2){
         QSPIReadMemory(addr,read_buf,read_size);
