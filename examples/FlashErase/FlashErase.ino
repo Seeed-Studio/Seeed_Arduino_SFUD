@@ -14,10 +14,6 @@ void setup()
     SERIAL.begin(115200);
     while(!SERIAL) {};
     while(!(sfud_init() == SFUD_SUCCESS));
-}
-
-void loop()
-{   
     /* erase test */
     const sfud_flash *flash = sfud_get_device_table() + 0;
     uint32_t addr = 0;
@@ -29,5 +25,8 @@ void loop()
     } else {
         printf("Erase the %s flash data failed.\r\n", flash->name);
     }
-    delay(5000);    
+}
+
+void loop()
+{    
 }

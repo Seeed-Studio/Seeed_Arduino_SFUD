@@ -14,18 +14,15 @@ void setup()
     SERIAL.begin(115200);
     while(!SERIAL) {};
     while(!(sfud_init() == SFUD_SUCCESS));
-}
-
-void loop()
-{   
-    
-
     #ifdef SFUD_USING_QSPI
     sfud_qspi_fast_read_enable(sfud_get_device(SFUD_W25Q32_DEVICE_INDEX), 4);
     #endif 
     sfud_demo(0, sizeof(sfud_demo_test_buf), sfud_demo_test_buf);
+}
 
-    delay(5000);    
+void loop()
+{   
+      
 }
 /**
  * SFUD demo for the first flash device test.

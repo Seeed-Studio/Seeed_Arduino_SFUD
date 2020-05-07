@@ -14,13 +14,8 @@ void setup()
     SERIAL.begin(115200);
     while(!SERIAL) {};
     while(!(sfud_init() == SFUD_SUCCESS));
-}
-
-void loop()
-{   
-    
     #ifdef SFUD_USING_QSPI
-    sfud_qspi_fast_read_enable(sfud_get_device(SFUD_W25Q32_DEVICE_INDEX), 4);
+    sfud_qspi_fast_read_enable(sfud_get_device(SFUD_W25Q32_DEVICE_INDEX), 2);
     #endif
     const sfud_flash *flash = sfud_get_device_table() + 0;
     uint32_t addr = 0;
@@ -43,5 +38,8 @@ void loop()
     } else {
         printf("Read the %s flash data failed.\r\n", flash->name);
     }
-    delay(5000);    
+}
+
+void loop()
+{     
 }

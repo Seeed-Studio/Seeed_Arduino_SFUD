@@ -51,31 +51,34 @@ static sfud_err spi_write_read(const sfud_spi *spi, const uint8_t *write_buf, si
     }
     
 #ifdef SFUD_USING_QSPI
-    if (write_size > 1){
-        if (4 == write_size){
-            uint32_t Address = (write_buf[1] << 16) | (write_buf[2] << 8) | (write_buf[3]);
-            QSPIEraseCommand(write_buf[0],Address);
-        }
-        else if (write_size > 4){
-            if(read_size){
-                QSPIReadSFDP(write_buf[0],write_buf + 1,write_size - 1,read_buf,read_size + 1);
-                for (uint8_t index = 0 ; index < read_size; index++)
-                {
-                    read_buf[index] = read_buf[index + 1];
-                }
-            }else{
-                uint32_t Address = (write_buf[1] << 16) | (write_buf[2] << 8) | (write_buf[3]);
-                QSPIWriteMemory(Address,write_buf+4,write_size - 4);
+
+    if (read_size)
+    {
+        if (write_size > 4)
+        {
+            QSPIReadSFDP(write_buf[0],write_buf + 1,write_size - 1,read_buf,read_size + 1);
+            for (uint8_t index = 0 ; index < read_size; index++)
+            {
+            read_buf[index] = read_buf[index + 1];
             }
+        }else if (1 == write_size)
+        {
+            QSPIReadCommand(write_buf[0],read_buf,read_size);
+        }
+    }else
+    {
+        if (1 == write_size){
+            QSPIRunCommand(write_buf[0]);
+        }
+        else if (write_size > 4)
+        {
+            uint32_t Address = (write_buf[1] << 16) | (write_buf[2] << 8) | (write_buf[3]);
+            QSPIWriteMemory(Address,&write_buf[4],write_size - 4);         
         }
         else{
-            QSPIWriteCommand(write_buf[0],write_buf+1,write_size-1);
+            uint32_t Address = (write_buf[1] << 16) | (write_buf[2] << 8) | (write_buf[3]);
+            QSPIEraseCommand(write_buf[0],Address);      
         }
-    }else if(read_size){
-        QSPIReadCommand(write_buf[0],read_buf,read_size);
-    }
-    else{
-        QSPIRunCommand(write_buf[0]);
     }
 
 #else
@@ -112,9 +115,11 @@ static sfud_err qspi_read(const struct __sfud_spi *spi, uint32_t addr, sfud_qspi
     /**
      * add your qspi read flash data code
      */
+    SFUD_INFO("QSPIReadMemory");
     if (qspi_read_cmd_format->instruction_lines == 1&& qspi_read_cmd_format->address_lines == 1 \
-        && qspi_read_cmd_format->data_lines == 4){
+        && qspi_read_cmd_format->data_lines == 2){
         QSPIReadMemory(addr,read_buf,read_size);
+
     }else{
         result = SFUD_ERR_READ;
         return result;
