@@ -11,6 +11,7 @@ static void sfud_demo(uint32_t addr, size_t size, uint8_t *data);
 #endif
 void setup()
 {
+    SERIAL.begin(115200);
     while(!SERIAL) {};
     while(!(sfud_init() == SFUD_SUCCESS));
 }
