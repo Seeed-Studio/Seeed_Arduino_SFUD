@@ -4,7 +4,6 @@
 
 #ifdef SFUD_USING_QSPI
 Adafruit_FlashTransport_QSPI QSPIdev;
-#define QSPIDEV QSPIdev
 void QSPIBegin(){
     QSPIDEV.begin();
 }
@@ -41,9 +40,13 @@ bool QSPIReadSFDP(uint8_t command, uint8_t *data, uint32_t data_len, uint8_t *re
 }
 
 #else
-#define SPIDEV SPI
+
 void SPIBegin(){
     SPIDEV.begin();
+}
+
+void SPISetClock(uint64_t hz){
+    SPISettings(hz,MSBFIRST,SPI_MODE0);
 }
 
 uint8_t SPITransfer(uint8_t data){

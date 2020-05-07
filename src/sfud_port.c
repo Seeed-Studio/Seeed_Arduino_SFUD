@@ -33,7 +33,8 @@
 static char log_buf[256];
 
 int chipSelectPin = 1;
-
+unsigned long QSPIclock = 104000000UL;
+unsigned long SPIclock = 4000000UL;
 void sfud_log_debug(const char *file, const long line, const char *format, ...);
 /**
  * SPI write data then read data
@@ -151,9 +152,10 @@ sfud_err sfud_spi_port_init(sfud_flash *flash) {
      */
 #ifdef SFUD_USING_QSPI
     QSPIBegin();
-    QSPISetClockSpeed(min(SFUD_W25Q32_MAX_SPEED,VARIANT_GCLK2_FREQ));
+    QSPISetClockSpeed(min(QSPIclock,VARIANT_GCLK2_FREQ));
 #else
     SPIBegin();
+    SPISetClock(SPIclock);
     SPICsInit(chipSelectPin, OUTPUT);
 #endif
     flash->spi.wr = spi_write_read;

@@ -56,5 +56,7 @@ enum {
 #endif
 
 extern int chipSelectPin;
+extern unsigned long SPIclock;
+extern unsigned long QSPIclock;
 #define SFUD_W25Q32_MAX_SPEED 104000000UL
 #endif /* _SFUD_CFG_H_ */
