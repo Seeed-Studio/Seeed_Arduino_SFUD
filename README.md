@@ -1,4 +1,4 @@
-# Seeed_Arduino_SFUD
+# Seeed_Arduino_SFUD  [![Build Status](https://github.com/Seeed-Studio/Seeed_Arduino_SFUD.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Seeed_Arduino_SFUD)
 
 ---
 
