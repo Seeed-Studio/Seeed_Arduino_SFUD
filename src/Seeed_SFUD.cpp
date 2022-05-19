@@ -75,6 +75,16 @@ namespace fs {
             _pdrv = 0xFF;
         }
     }
+    uint8_t SFUDFS::getPhysicalDriveNumber() {
+        return _pdrv;
+    }
+    String SFUDFS::getDriveLetter() {
+        if (_pdrv == 0xFF) {
+            // Card not initialized
+            return "";
+        }
+        return String(_pdrv) + ":";
+    }
     sfud_type_t SFUDFS::flashType() {
         if (_pdrv == 0xFF) {
             return FLASH_NONE;

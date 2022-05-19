@@ -55,6 +55,9 @@ namespace fs {
         //call this when a card is removed. It will allow you to insert and initialise a new card.
         boolean end();
 
+        uint8_t getPhysicalDriveNumber();
+        String getDriveLetter();
+
         sfud_type_t flashType();
         uint64_t flashSize();
         uint64_t totalBytes();
