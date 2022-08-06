@@ -22,37 +22,43 @@
 #include <SPI.h>
 #include <Seeed_FS.h>
 
-typedef enum {
+typedef enum
+{
     FLASH_NONE,
     FLASH_SPI
 } sfud_type_t;
 
 #define SECTORSIZE 4096
 
-typedef struct {
+typedef struct
+{
     uint8_t ssPin;
     int16_t sector_size;
+    const sfud_flash *flash;
     sfud_type_t type;
     unsigned long sectors;
     int status;
 } ardu_sfud_t;
 
-static ardu_sfud_t* s_sfuds[_VOLUMES] = { NULL };
-namespace fs {
+static ardu_sfud_t *s_sfuds[_VOLUMES] = {NULL};
+namespace fs
+{
 
-    class SFUDFS : public FS {
-      private:
+    class SFUDFS : public FS
+    {
+    private:
         uint8_t _pdrv;
         TCHAR _drv[2] = {_T('0' + _pdrv), _T(':')};
         boolean init();
-      public:
+
+    public:
         SFUDFS() {}
         ~SFUDFS() {}
         // This needs to be called to set up the connection to the SD card
         // before other methods are used.
-        boolean begin(uint8_t ssPin, SPIClass& spi, int hz); //SPI
-        boolean begin(int hz); //QSPI
-        //call this when a card is removed. It will allow you to insert and initialise a new card.
+        boolean begin(uint8_t ssPin, SPIClass &spi, int hz); // SPI
+        boolean begin(int hz = SFUD_W25Q32_MAX_SPEED);       // QSPI
+        // call this when a card is removed. It will allow you to insert and initialise a new card.
         boolean end();
 
         sfud_type_t flashType();
@@ -60,14 +66,14 @@ namespace fs {
         uint64_t totalBytes();
         uint64_t usedBytes();
     };
-    
+
     extern SFUDFS SFUD;
 };
 
 using namespace fs;
-typedef fs::File        SFUDFile;
-typedef fs::SFUDFS      SFUDFileSystemClass;
-#define SFUDFileSystemClass    SFUD
+typedef fs::File SFUDFile;
+typedef fs::SFUDFS SFUDFileSystemClass;
+#define SFUDFileSystemClass SFUD
 
 #endif
 #endif

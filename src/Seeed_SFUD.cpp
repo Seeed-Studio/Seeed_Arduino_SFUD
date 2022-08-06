@@ -10,62 +10,72 @@
 
 DSTATUS flash_disk_initialize(BYTE pdrv);
 DSTATUS flash_disk_status(BYTE pdrv);
-DRESULT flash_disk_read(BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
-DRESULT flash_disk_write(BYTE pdrv, const BYTE* buff, DWORD sector, UINT count);
-DRESULT flash_disk_ioctl(BYTE pdrv, BYTE cmd, void* buff);
+DRESULT flash_disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count);
+DRESULT flash_disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count);
+DRESULT flash_disk_ioctl(BYTE pdrv, BYTE cmd, void *buff);
 
-namespace fs {
+namespace fs
+{
 
-    boolean SFUDFS::begin(uint8_t ssPin, SPIClass& spi, int hz) {
-        #define SPIDEV *spi
+    boolean SFUDFS::begin(uint8_t ssPin, SPIClass &spi, int hz)
+    {
+#define SPIDEV *spi
         chipSelectPin = ssPin;
         SPIclock = hz;
         return init();
     }
-    boolean SFUDFS::begin(int hz){
+    boolean SFUDFS::begin(int hz)
+    {
         QSPIclock = hz;
         return init();
     }
-    boolean SFUDFS::init(void){
+    boolean SFUDFS::init(void)
+    {
         _pdrv = 0xff;
-        if (ff_diskio_get_drive(&_pdrv) != 0 || _pdrv == 0xFF) {
+        if (ff_diskio_get_drive(&_pdrv) != 0 || _pdrv == 0xFF)
+        {
             return false;
-        }      
-        ardu_sfud_t* flash_t = (ardu_sfud_t*)malloc(sizeof(ardu_sfud_t));
+        }
+        ardu_sfud_t *flash_t = (ardu_sfud_t *)malloc(sizeof(ardu_sfud_t));
         flash_t->type = FLASH_NONE;
         flash_t->status = STA_NOINIT;
-        flash_t->sector_size = SECTORSIZE;    
-        s_sfuds[_pdrv] = flash_t; 
+        s_sfuds[_pdrv] = flash_t;
         static const ff_diskio_impl_t flash_impl = {
             .init = &flash_disk_initialize,
             .status = &flash_disk_status,
             .read = &flash_disk_read,
             .write = &flash_disk_write,
-            .ioctl = &flash_disk_ioctl
-        };
+            .ioctl = &flash_disk_ioctl};
         ff_diskio_register(_pdrv, &flash_impl);
         FRESULT status;
         _drv[0] = _T('0' + _pdrv);
         status = f_mount(&root, _drv, 1);
-       
-        if (status == FR_NO_FILESYSTEM){
-            BYTE work[SECTORSIZE]; /* Work area (larger is better for processing time) */
+
+        if (status == FR_NO_FILESYSTEM)
+        {
+            BYTE work[512]; /* Work area (larger is better for processing time) */
             FRESULT ret;
-            ret = f_mkfs(_drv, FM_FAT, 0, work, sizeof(work));        
-            status = f_mount(&root,_drv, 1);
+            ret = f_mkfs(_drv, FM_FAT, 0, work, sizeof(work));
+            status = f_mount(&root, _drv, 1);
         }
-        if (status != FR_OK) {
+        if (status != FR_OK)
+        {
             return false;
-        } else {
+        }
+        else
+        {
             return true;
         }
     }
-    boolean SFUDFS::end() {
-        if (_pdrv != 0xFF) {
-            
+    boolean SFUDFS::end()
+    {
+        if (_pdrv != 0xFF)
+        {
+
             f_mount(NULL, _drv, 1);
-            ardu_sfud_t* flash_t = s_sfuds[_pdrv];
-            if (_pdrv >= _VOLUMES || flash_t == NULL) {
+            ardu_sfud_t *flash_t = s_sfuds[_pdrv];
+            if (_pdrv >= _VOLUMES || flash_t == NULL)
+            {
                 return false;
             }
             ff_diskio_register(_pdrv, NULL);
@@ -75,69 +85,80 @@ namespace fs {
             _pdrv = 0xFF;
         }
     }
-    sfud_type_t SFUDFS::flashType() {
-        if (_pdrv == 0xFF) {
+    sfud_type_t SFUDFS::flashType()
+    {
+        if (_pdrv == 0xFF)
+        {
             return FLASH_NONE;
         }
-        ardu_sfud_t* flash_t = s_sfuds[_pdrv];
-        if (_pdrv >= _VOLUMES || flash_t == NULL) {
+        ardu_sfud_t *flash_t = s_sfuds[_pdrv];
+        if (_pdrv >= _VOLUMES || flash_t == NULL)
+        {
             return FLASH_NONE;
-        }   
+        }
         return flash_t->type;
     }
-    uint64_t SFUDFS::flashSize() {
-        if (_pdrv == 0xFF) {
+    uint64_t SFUDFS::flashSize()
+    {
+        if (_pdrv == 0xFF)
+        {
             return false;
         }
-        ardu_sfud_t* flash_t = s_sfuds[_pdrv];
-        if (_pdrv >= _VOLUMES || flash_t == NULL) {
+        ardu_sfud_t *flash_t = s_sfuds[_pdrv];
+        if (_pdrv >= _VOLUMES || flash_t == NULL)
+        {
             return false;
         }
-       
+
         return flash_t->sectors * flash_t->sector_size;
     }
-    uint64_t SFUDFS::totalBytes() {
-        FATFS* fsinfo;
+    uint64_t SFUDFS::totalBytes()
+    {
+        FATFS *fsinfo;
         FRESULT ret = FR_OK;
         DWORD free_clust;
-        
+
         ret = f_getfree(_drv, &free_clust, &fsinfo);
-   
+
         uint64_t size = ((uint64_t)(fsinfo->csize)) * (fsinfo->n_fatent - 2)
-                        #if _MAX_SS != 512
+#if _MAX_SS != 512
                         * (fsinfo->ssize);
-                        #else
+#else
                         * 512;
-                        #endif
+#endif
         return size;
     }
-    uint64_t SFUDFS::usedBytes() {
-        FATFS* fsinfo;
+    uint64_t SFUDFS::usedBytes()
+    {
+        FATFS *fsinfo;
         DWORD free_clust;
         FRESULT ret = FR_OK;
         ret = f_getfree(_drv, &free_clust, &fsinfo);
 
         uint64_t size = ((uint64_t)(fsinfo->csize)) * ((fsinfo->n_fatent - 2) - (fsinfo->free_clst))
-                        #if _MAX_SS != 512
+#if _MAX_SS != 512
                         * (fsinfo->ssize);
-                        #else
+#else
                         * 512;
-                        #endif
+#endif
         return size;
     }
     SFUDFS SFUD;
 };
-const sfud_flash* flash = (sfud_flash*)malloc(sizeof(sfud_flash));
 
-DSTATUS flash_disk_initialize(uint8_t pdrv){
-    ardu_sfud_t* flash_t = s_sfuds[pdrv];
-    if (!(flash_t->status & STA_NOINIT)) {
+DSTATUS flash_disk_initialize(uint8_t pdrv)
+{
+    ardu_sfud_t *flash_t = s_sfuds[pdrv];
+    if (!(flash_t->status & STA_NOINIT))
+    {
         return flash_t->status;
     }
-    if(sfud_init()==SFUD_SUCCESS){
+    if (sfud_init() == SFUD_SUCCESS)
+    {
         flash_t->status &= ~STA_NOINIT;
-        flash = sfud_get_device_table() + 0;
-        flash_t->sectors = flash->chip.capacity / flash_t->sector_size;
+        flash_t->flash = sfud_get_device_table() + 0;
+        flash_t->sectors = flash_t->flash->chip.capacity / flash_t->flash->chip.erase_gran;
+        flash_t->sector_size = flash_t->flash->chip.erase_gran;
 #ifdef SFUD_USING_QSPI
         sfud_qspi_fast_read_enable(sfud_get_device(0), 2);
 #endif
@@ -147,45 +168,52 @@ DSTATUS flash_disk_initialize(uint8_t pdrv){
     flash_t->type = FLASH_NONE;
     return flash_t->status;
 }
-DSTATUS flash_disk_status(uint8_t pdrv) {
-    ardu_sfud_t* flash_t = s_sfuds[pdrv];
+DSTATUS flash_disk_status(uint8_t pdrv)
+{
+    ardu_sfud_t *flash_t = s_sfuds[pdrv];
     return flash_t->status;
 }
-DRESULT flash_disk_read(uint8_t pdrv, uint8_t* buffer, DWORD sector, UINT count) {
-    ardu_sfud_t* flash_t = s_sfuds[pdrv];
-    if (flash_t->status & STA_NOINIT) {
+DRESULT flash_disk_read(uint8_t pdrv, uint8_t *buffer, DWORD sector, UINT count)
+{
+    ardu_sfud_t *flash_t = s_sfuds[pdrv];
+    if (flash_t->status & STA_NOINIT)
+    {
         return RES_NOTRDY;
     }
     DRESULT res = RES_OK;
     sector = sector * flash_t->sector_size;
     count = count * flash_t->sector_size;
-    res = sfud_read(flash,sector,count,buffer) ? RES_ERROR : RES_OK;
+    res = sfud_read(flash_t->flash, sector, count, buffer) ? RES_ERROR : RES_OK;
     return res;
 }
-DRESULT flash_disk_write(uint8_t pdrv, const uint8_t* buffer, DWORD sector, UINT count) {
-    ardu_sfud_t* flash_t = s_sfuds[pdrv];
-    if (flash_t->status & STA_NOINIT) {
+DRESULT flash_disk_write(uint8_t pdrv, const uint8_t *buffer, DWORD sector, UINT count)
+{
+    ardu_sfud_t *flash_t = s_sfuds[pdrv];
+    if (flash_t->status & STA_NOINIT)
+    {
         return RES_NOTRDY;
     }
-    DRESULT res = RES_OK;    
+    DRESULT res = RES_OK;
     sector = sector * flash_t->sector_size;
     count = count * flash_t->sector_size;
-    res = sfud_erase_write(flash,sector,count,buffer) ? RES_ERROR : RES_OK;
+    res = sfud_erase_write(flash_t->flash, sector, count, buffer) ? RES_ERROR : RES_OK;
     return res;
 }
-DRESULT flash_disk_ioctl(uint8_t pdrv, uint8_t cmd, void* buff) {
-    switch (cmd) {
-        case CTRL_SYNC: 
-            return RES_OK;
-        case GET_SECTOR_COUNT:
-            *((unsigned long*) buff) = s_sfuds[pdrv]->sectors;
-            return RES_OK;
-        case GET_SECTOR_SIZE:
-            *((WORD*) buff) = s_sfuds[pdrv]->sector_size;
-            return RES_OK;
-        case GET_BLOCK_SIZE:
-            *((uint32_t*)buff) = 1;
-            return RES_OK;
+DRESULT flash_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff)
+{
+    switch (cmd)
+    {
+    case CTRL_SYNC:
+        return RES_OK;
+    case GET_SECTOR_COUNT:
+        *((unsigned long *)buff) = s_sfuds[pdrv]->sectors;
+        return RES_OK;
+    case GET_SECTOR_SIZE:
+        *((WORD *)buff) = s_sfuds[pdrv]->sector_size;
+        return RES_OK;
+    case GET_BLOCK_SIZE:
+        *((uint32_t *)buff) = 1;
+        return RES_OK;
     }
     return RES_PARERR;
 }
