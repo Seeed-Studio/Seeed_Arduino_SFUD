@@ -53,7 +53,7 @@ namespace fs
 
         if (status == FR_NO_FILESYSTEM)
         {
-            BYTE work[512]; /* Work area (larger is better for processing time) */
+            BYTE work[4096]; /* Work area (larger is better for processing time) */
             FRESULT ret;
             ret = f_mkfs(_drv, FM_FAT, 0, work, sizeof(work));
             status = f_mount(&root, _drv, 1);
