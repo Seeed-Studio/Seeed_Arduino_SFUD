@@ -94,4 +94,6 @@ static int sfud_demo(uint32_t addr, size_t size, uint8_t *data) {
         SERIAL.print(CostTime);
         SERIAL.println(" us");
     }
+
+    return 0;
 }

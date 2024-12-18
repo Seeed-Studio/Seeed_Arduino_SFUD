@@ -84,6 +84,8 @@ namespace fs
             free(flash_t);
             _pdrv = 0xFF;
         }
+
+        return true;
     }
     sfud_type_t SFUDFS::flashType()
     {
